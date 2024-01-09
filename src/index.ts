@@ -14,7 +14,6 @@ export type SearchResult = {
 };
 
 export default class DoujinStyleApi {
-  // tn
   async search(query?: string, page: number = 0): Promise<SearchResult> {
     const url = query
       ? `https://doujinstyle.com/?p=search&source=1&type=blanket${
