@@ -13,6 +13,10 @@ export type SearchResult = {
   lastPage: number;
 };
 
+const headers = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/118.0"
+};
+
 export default class DoujinStyleApi {
   async search(query?: string, page: number = 0): Promise<SearchResult> {
     const url = query
@@ -21,7 +25,7 @@ export default class DoujinStyleApi {
         }?page=${page}`
       : `https://doujinstyle.com/?p=home&page=${page}`;
 
-    const result = await fetch(url).then((x) => x.text());
+    const result = await fetch(url, { headers }).then((x) => x.text());
     const $ = Cheerio.load(result);
     const rentries = $(".gridBox");
     const entries = [];
@@ -53,10 +57,14 @@ export default class DoujinStyleApi {
     const url = "https://doujinstyle.com/";
     const result = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: { "Content-Type": "application/x-www-form-urlencoded", ...headers },
+      redirect: "manual",
       body: `type=1&id=${id}&source=0&download_link=`,
     });
 
-    return result.url;
+    const location = result.headers.get("Location");
+    if (!location)
+      throw new Error("No location in the headers.");
+    return location; 
   }
 }
